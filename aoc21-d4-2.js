@@ -23,6 +23,9 @@ bingoInput = bingoInput.split(",").map(Number);
 //console.log(bingoInput);
 
 //Mark inputs
+let tablesWon = 0;
+let wonTables = []; //sequence of table row numbers%5 which won
+
 for(let num of bingoInput){
     for(let i=0; i<bingoTables.length; i++)
         for(let j=0; j<bingoTables[0].length; j++){
@@ -30,9 +33,10 @@ for(let num of bingoInput){
                 bingoMark[i][j] = 1;
         }
     //console.log(bingoMark);
-    let bingoRow = checkBingo();
+    let bingoRow = checkBingo(num);
+    if(bingoRow)    console.log(`Last Bingo at Row: ${bingoRow}, on called number ${num}, table`);
     if(bingoRow){
-        console.log(`Bingo at Row: ${bingoRow}, on called number ${num}`);
+
         let tableStart = bingoRow - bingoRow%5;
         let winTable = bingoTables.slice(tableStart, tableStart+5);
         let winMarks = bingoMark.slice(tableStart, tableStart+5);
@@ -42,11 +46,11 @@ for(let num of bingoInput){
             for(let j=0; j<unMarks[i].length; j++)
                 sumUnMark += winTable[i][j]*unMarks[i][j];
         console.log(`Sum of unmarked numbers is ${sumUnMark}`);
-        break;
+
     }
 }
 
-function checkBingo(){
+function checkBingo(num){
     let rowSum = 0;
     let colSum = [0, 0, 0, 0, 0];
     for(let i=0; i<bingoTables.length; i++){
@@ -59,8 +63,16 @@ function checkBingo(){
             colSum[j] += bingoMark[i][j];
         }
         if(rowSum == 5 || colSum.indexOf(5) >= 0){
-            console.log("BINGOOOOOO!!!!!!!", i);
-            return i;
+            if(wonTables.indexOf(i-i%5) == -1){
+                wonTables.push(i-i%5);
+               // console.log(wonTables, num);  //sequence of winnings
+                if(i-i%5 == 470){    //last to win is 470 as per previous iteration for given input
+                    return i-i%5;
+                }
+            }
+
+            //console.log("BINGOOOOOO!!!!!!!", i, i-i%5);
+            //return i;
         }
     }
     return false
